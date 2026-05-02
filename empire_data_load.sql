@@ -1,0 +1,14 @@
+USE WAREHOUSE GAVI_COMPUTE_WH;
+USE DATABASE EMPIRE_DB;
+USE SCHEMA BRONZE_LAYER;
+
+CREATE OR REPLACE STAGE EMPIRE_S3_STAGE
+  URL = 's3://gavi-empire-bucket/raw_data/'
+  COMMENT = 'The secure parking lot for Maalkin''s incoming Parquet files';
+
+COPY INTO RAW_WORKFLOW_LOGS
+  FROM @EMPIRE_S3_STAGE/empire_bronze_layer.parquet
+  FILE_FORMAT = (TYPE = 'PARQUET')
+  ON_ERROR = 'SKIP_FILE';
+
+ALTER WAREHOUSE GAVI_COMPUTE_WH SUSPEND;
